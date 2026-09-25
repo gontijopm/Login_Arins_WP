@@ -13,7 +13,7 @@
 define('ABSPATH', __DIR__ . '/');
 
 require __DIR__ . '/../includes/class-arins-login-barra-admin.php';
-// require __DIR__ . '/../includes/class-arins-login-tela.php'; // adicionado na Tarefa 3
+require __DIR__ . '/../includes/class-arins-login-tela.php';
 
 class Arins_Login_Falha_De_Teste extends Exception {}
 
