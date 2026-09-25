@@ -80,21 +80,49 @@ class Arins_Login_Tela {
 
     public static function abrir_layout() {
         $v = Arins_Login_Aparencia::valores();
-        $logo = Arins_Login_Aparencia::url_anexo((int) $v['logo_id']);
-        $titulo = (string) $v['titulo'];
+        $estilo2 = Arins_Login_Aparencia::sanitizar_estilo($v['estilo']) === 2;
         ?>
         <div class="arins-login-wrap">
             <div class="arins-login-fundo" role="presentation"></div>
             <div class="arins-login-painel">
-                <div class="arins-login-topo">
-                    <?php if ($logo !== '') : ?>
-                        <img src="<?php echo esc_url($logo); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>">
-                    <?php endif; ?>
-                </div>
+                <?php if ($estilo2) : self::marca($v); else : self::topo($v); endif; ?>
                 <div class="arins-login-conteudo">
-                    <?php if ($titulo !== '') : ?>
-                        <h2 class="arins-login-titulo"><?php echo esc_html($titulo); ?></h2>
+                    <?php if (!$estilo2 && (string) $v['titulo'] !== '') : ?>
+                        <h2 class="arins-login-titulo"><?php echo esc_html($v['titulo']); ?></h2>
                     <?php endif; ?>
+        <?php
+    }
+
+    /** Estilo 1: faixa dourada com a barra de chevrons e o brasão. */
+    private static function topo($v) {
+        $logo = Arins_Login_Aparencia::url_anexo((int) $v['logo_id']);
+        ?>
+        <div class="arins-login-topo">
+            <?php if ($logo !== '') : ?>
+                <img src="<?php echo esc_url($logo); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>">
+            <?php endif; ?>
+        </div>
+        <?php
+    }
+
+    /** Estilo 2: linha dourada, logo, título e subtítulo, exatamente como digitados. */
+    private static function marca($v) {
+        $logo = Arins_Login_Aparencia::url_anexo((int) $v['marca_logo_id']);
+        if ($logo === '') {
+            $logo = ARINS_LOGIN_URL . 'assets/images/escudo-pmmg-mono-gold.png';
+        }
+        ?>
+        <div class="arins-login-marca">
+            <img src="<?php echo esc_url($logo); ?>" alt="">
+            <div class="arins-login-marca-textos">
+                <?php if ((string) $v['marca_titulo'] !== '') : ?>
+                    <p class="arins-login-marca-titulo"><?php echo esc_html($v['marca_titulo']); ?></p>
+                <?php endif; ?>
+                <?php if ((string) $v['marca_subtitulo'] !== '') : ?>
+                    <p class="arins-login-marca-subtitulo"><?php echo esc_html($v['marca_subtitulo']); ?></p>
+                <?php endif; ?>
+            </div>
+        </div>
         <?php
     }
 

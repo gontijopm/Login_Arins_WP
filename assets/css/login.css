@@ -287,3 +287,45 @@ body.login #login_error { border-left-color: #d9534f; }
 }
 
 .arins-login-rodape a:hover { color: var(--arins-destaque); }
+
+/* ---- Estilo 2: painel todo preto com a marca no topo ----
+   Sem a faixa dourada nem a barra de chevrons; o título "ARINS PMMG" do
+   Estilo 1 também não é exibido. Os textos aparecem como digitados (sem
+   text-transform), então maiúsculas e minúsculas são respeitadas. */
+
+body.arins-estilo-2 .arins-login-painel { background: #000; }
+
+body.arins-estilo-2 .arins-login-conteudo { padding-top: 4rem; }
+
+.arins-login-marca {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin: 4rem 2.5rem 0;
+    padding: 0.5rem 0 0.5rem 1.75rem;
+    border-left: 1px solid var(--arins-faixa);
+}
+
+.arins-login-marca img {
+    flex: 0 0 auto;
+    height: 96px;
+    width: auto;
+    max-width: 40%;
+    object-fit: contain;
+}
+
+.arins-login-marca-titulo {
+    margin: 0 0 0.35rem;
+    color: var(--arins-destaque);
+    font-size: 2.25rem;
+    font-weight: 900;
+    line-height: 1.1;
+}
+
+.arins-login-marca-subtitulo {
+    margin: 0;
+    color: var(--arins-suave);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    line-height: 1.4;
+}

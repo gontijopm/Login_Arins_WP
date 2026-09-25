@@ -20,6 +20,7 @@ class Arins_Login_Aparencia {
         add_action('arins_login_configuracao_depois', array(__CLASS__, 'secao'));
         add_action('admin_enqueue_scripts', array(__CLASS__, 'scripts_admin'));
         add_action('login_enqueue_scripts', array(__CLASS__, 'estilos_login'), 20);
+        add_filter('login_body_class', array(__CLASS__, 'classe_do_corpo'));
         add_action('login_form_lostpassword', array(__CLASS__, 'bloquear_recuperacao'));
         add_action('login_form_retrievepassword', array(__CLASS__, 'bloquear_recuperacao'));
     }
@@ -34,16 +35,25 @@ class Arins_Login_Aparencia {
             'cor_destaque' => '#dfca8c',
             'fundos' => array(),
             'titulo' => 'ARINS PMMG',
+            'estilo' => 1,
+            'marca_logo_id' => 0,
+            'marca_titulo' => 'Arins',
+            'marca_subtitulo' => 'ASSESSORIA DE RELAÇÕES INSTITUCIONAIS',
         );
     }
 
-    /** Texto puro (sem HTML), até 60 caracteres; vazio oculta o título. */
-    public static function sanitizar_titulo($valor, $padrao) {
+    /** Estilo 1 (painel com faixa dourada) ou 2 (painel preto com a marca). */
+    public static function sanitizar_estilo($valor) {
+        return (is_scalar($valor) && (string) $valor === '2') ? 2 : 1;
+    }
+
+    /** Texto puro (sem HTML), até $max caracteres, mantendo maiúsculas e minúsculas; vazio oculta o texto. */
+    public static function sanitizar_titulo($valor, $padrao, $max = 60) {
         if (!is_string($valor)) {
             return $padrao;
         }
         $valor = trim(preg_replace('/\s+/', ' ', strip_tags($valor)));
-        return mb_substr($valor, 0, 60);
+        return mb_substr($valor, 0, $max);
     }
 
     public static function sanitizar_cor($valor, $padrao) {
@@ -81,6 +91,10 @@ class Arins_Login_Aparencia {
             'cor_destaque' => self::sanitizar_cor(isset($bruto['cor_destaque']) ? $bruto['cor_destaque'] : null, $padroes['cor_destaque']),
             'fundos' => self::sanitizar_ids(isset($bruto['fundos']) ? $bruto['fundos'] : array()),
             'titulo' => self::sanitizar_titulo(isset($bruto['titulo']) ? $bruto['titulo'] : null, $padroes['titulo']),
+            'estilo' => self::sanitizar_estilo(isset($bruto['estilo']) ? $bruto['estilo'] : null),
+            'marca_logo_id' => (isset($bruto['marca_logo_id']) && is_scalar($bruto['marca_logo_id']) && ctype_digit((string) $bruto['marca_logo_id'])) ? (int) $bruto['marca_logo_id'] : 0,
+            'marca_titulo' => self::sanitizar_titulo(isset($bruto['marca_titulo']) ? $bruto['marca_titulo'] : null, $padroes['marca_titulo']),
+            'marca_subtitulo' => self::sanitizar_titulo(isset($bruto['marca_subtitulo']) ? $bruto['marca_subtitulo'] : null, $padroes['marca_subtitulo'], 100),
         );
     }
 
@@ -128,6 +142,9 @@ class Arins_Login_Aparencia {
         if ($limpo['logo_id'] > 0 && !wp_attachment_is_image($limpo['logo_id'])) {
             $limpo['logo_id'] = 0;
         }
+        if ($limpo['marca_logo_id'] > 0 && !wp_attachment_is_image($limpo['marca_logo_id'])) {
+            $limpo['marca_logo_id'] = 0;
+        }
         $limpo['fundos'] = array_values(array_filter($limpo['fundos'], 'wp_attachment_is_image'));
         return $limpo;
     }
@@ -154,6 +171,14 @@ class Arins_Login_Aparencia {
         }
     }
 
+    public static function classe_do_corpo($classes) {
+        $v = self::valores();
+        if (self::sanitizar_estilo($v['estilo']) === 2) {
+            $classes[] = 'arins-estilo-2';
+        }
+        return $classes;
+    }
+
     public static function exibir_voltar() {
         $v = self::valores();
         return !empty($v['exibir_voltar']);
@@ -175,23 +200,25 @@ class Arins_Login_Aparencia {
 jQuery(function ($) {
     $('.arins-login-cor').wpColorPicker();
 
-    var quadroLogo;
-    $('#arins-login-logo-escolher').on('click', function (e) {
-        e.preventDefault();
-        if (!quadroLogo) {
-            quadroLogo = wp.media({ title: 'Logo da tela de login', multiple: false, library: { type: 'image' } });
-            quadroLogo.on('select', function () {
-                var anexo = quadroLogo.state().get('selection').first().toJSON();
-                $('#arins-login-logo-id').val(anexo.id);
-                $('#arins-login-logo-previa').attr('src', anexo.url).show();
-            });
-        }
-        quadroLogo.open();
-    });
-    $('#arins-login-logo-remover').on('click', function (e) {
-        e.preventDefault();
-        $('#arins-login-logo-id').val('0');
-        $('#arins-login-logo-previa').hide().attr('src', '');
+    $('.arins-login-logo').each(function () {
+        var caixa = $(this), quadro;
+        caixa.find('.arins-login-logo-escolher').on('click', function (e) {
+            e.preventDefault();
+            if (!quadro) {
+                quadro = wp.media({ title: 'Escolher logo', multiple: false, library: { type: 'image' } });
+                quadro.on('select', function () {
+                    var anexo = quadro.state().get('selection').first().toJSON();
+                    caixa.find('.arins-login-logo-id').val(anexo.id);
+                    caixa.find('.arins-login-logo-previa').attr('src', anexo.url).show();
+                });
+            }
+            quadro.open();
+        });
+        caixa.find('.arins-login-logo-remover').on('click', function (e) {
+            e.preventDefault();
+            caixa.find('.arins-login-logo-id').val('0');
+            caixa.find('.arins-login-logo-previa').hide().attr('src', '');
+        });
     });
 
     var quadroFundos;
@@ -231,21 +258,59 @@ JS
         }
         $v = self::valores();
         $logo = self::url_anexo((int) $v['logo_id']);
+        $marca_logo = self::url_anexo((int) $v['marca_logo_id']);
         $nome = esc_attr(self::OPCAO);
         $fundos = self::sanitizar_ids($v['fundos']);
+        $estilo = self::sanitizar_estilo($v['estilo']);
         ?>
         <h2>Aparência da tela de login</h2>
         <form method="post" action="options.php">
             <?php settings_fields('arins_login_aparencia'); ?>
             <table class="form-table" role="presentation">
                 <tr>
-                    <th scope="row">Logo da faixa dourada</th>
+                    <th scope="row">Estilo</th>
                     <td>
-                        <input type="hidden" id="arins-login-logo-id" name="<?php echo $nome; ?>[logo_id]" value="<?php echo esc_attr((int) $v['logo_id']); ?>">
-                        <img id="arins-login-logo-previa" src="<?php echo esc_url($logo); ?>" alt="" style="max-width:220px;max-height:100px;height:auto;display:<?php echo $logo ? 'block' : 'none'; ?>;margin-bottom:8px;background:#a89562;padding:4px;">
-                        <button type="button" class="button" id="arins-login-logo-escolher">Escolher imagem</button>
-                        <button type="button" class="button" id="arins-login-logo-remover">Remover logo</button>
-                        <p class="description">Aparece inteiro, sem cortes, centralizado na faixa dourada do topo do painel.</p>
+                        <label><input type="radio" name="<?php echo $nome; ?>[estilo]" value="1" <?php checked($estilo, 1); ?>> <strong>Estilo 1</strong> — painel com faixa dourada, barra de chevrons e brasão</label><br>
+                        <label><input type="radio" name="<?php echo $nome; ?>[estilo]" value="2" <?php checked($estilo, 2); ?>> <strong>Estilo 2</strong> — painel todo preto, com a marca (linha dourada, logo, título e subtítulo)</label>
+                        <p class="description">Nos dois estilos, a foto de fundo fica à esquerda e o formulário à direita.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Logo da faixa dourada <em>(Estilo 1)</em></th>
+                    <td>
+                        <div class="arins-login-logo">
+                            <input type="hidden" class="arins-login-logo-id" name="<?php echo $nome; ?>[logo_id]" value="<?php echo esc_attr((int) $v['logo_id']); ?>">
+                            <img class="arins-login-logo-previa" src="<?php echo esc_url($logo); ?>" alt="" style="max-width:220px;max-height:100px;height:auto;display:<?php echo $logo ? 'block' : 'none'; ?>;margin-bottom:8px;background:#a89562;padding:4px;">
+                            <button type="button" class="button arins-login-logo-escolher">Escolher imagem</button>
+                            <button type="button" class="button arins-login-logo-remover">Remover logo</button>
+                            <p class="description">Aparece inteiro, sem cortes, centralizado na faixa dourada do topo do painel.</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Logo da marca <em>(Estilo 2)</em></th>
+                    <td>
+                        <div class="arins-login-logo">
+                            <input type="hidden" class="arins-login-logo-id" name="<?php echo $nome; ?>[marca_logo_id]" value="<?php echo esc_attr((int) $v['marca_logo_id']); ?>">
+                            <img class="arins-login-logo-previa" src="<?php echo esc_url($marca_logo); ?>" alt="" style="max-width:220px;max-height:100px;height:auto;display:<?php echo $marca_logo ? 'block' : 'none'; ?>;margin-bottom:8px;background:#111;padding:4px;">
+                            <button type="button" class="button arins-login-logo-escolher">Escolher imagem</button>
+                            <button type="button" class="button arins-login-logo-remover">Usar o escudo padrão</button>
+                            <p class="description">Sem imagem escolhida, usa o escudo dourado do plugin.</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="arins-login-marca-titulo">Título da marca <em>(Estilo 2)</em></label></th>
+                    <td>
+                        <input type="text" class="regular-text" id="arins-login-marca-titulo" maxlength="60" name="<?php echo $nome; ?>[marca_titulo]" value="<?php echo esc_attr($v['marca_titulo']); ?>">
+                        <p class="description">Texto grande em dourado. Maiúsculas e minúsculas são exibidas exatamente como digitadas.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="arins-login-marca-subtitulo">Subtítulo da marca <em>(Estilo 2)</em></label></th>
+                    <td>
+                        <input type="text" class="large-text" id="arins-login-marca-subtitulo" maxlength="100" name="<?php echo $nome; ?>[marca_subtitulo]" value="<?php echo esc_attr($v['marca_subtitulo']); ?>">
+                        <p class="description">Maiúsculas e minúsculas são exibidas exatamente como digitadas.</p>
                     </td>
                 </tr>
                 <tr>
@@ -265,7 +330,7 @@ JS
                     </td>
                 </tr>
                 <tr>
-                    <th scope="row"><label for="arins-login-titulo">Título do painel</label></th>
+                    <th scope="row"><label for="arins-login-titulo">Título do painel <em>(Estilo 1)</em></label></th>
                     <td>
                         <input type="text" class="regular-text" id="arins-login-titulo" maxlength="60" name="<?php echo $nome; ?>[titulo]" value="<?php echo esc_attr($v['titulo']); ?>">
                         <p class="description">Texto acima dos campos de login. Deixe vazio para não exibir título.</p>

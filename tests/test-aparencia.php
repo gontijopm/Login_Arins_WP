@@ -109,3 +109,46 @@ function test_aparencia_titulo_vazio_e_permitido_e_nao_string_usa_padrao() {
 function test_aparencia_sanitizar_guarda_o_titulo() {
     assert_same('Novo título', Arins_Login_Aparencia::sanitizar(array('titulo' => 'Novo título'))['titulo']);
 }
+
+function test_aparencia_estilo_padrao_e_1() {
+    assert_same(1, Arins_Login_Aparencia::padroes()['estilo']);
+}
+
+function test_aparencia_estilo_aceita_so_1_ou_2() {
+    assert_same(2, Arins_Login_Aparencia::sanitizar_estilo('2'));
+    assert_same(2, Arins_Login_Aparencia::sanitizar_estilo(2));
+    assert_same(1, Arins_Login_Aparencia::sanitizar_estilo('1'));
+    assert_same(1, Arins_Login_Aparencia::sanitizar_estilo('3'));
+    assert_same(1, Arins_Login_Aparencia::sanitizar_estilo('abc'));
+    assert_same(1, Arins_Login_Aparencia::sanitizar_estilo(null));
+}
+
+function test_aparencia_marca_padroes() {
+    $p = Arins_Login_Aparencia::padroes();
+    assert_same('Arins', $p['marca_titulo']);
+    assert_same('ASSESSORIA DE RELAÇÕES INSTITUCIONAIS', $p['marca_subtitulo']);
+    assert_same(0, $p['marca_logo_id']);
+}
+
+function test_aparencia_marca_preserva_maiusculas_e_minusculas() {
+    $r = Arins_Login_Aparencia::sanitizar(array(
+        'marca_titulo' => 'ArIns PmMg',
+        'marca_subtitulo' => 'Assessoria de Relações Institucionais',
+        'estilo' => '2',
+        'marca_logo_id' => '15',
+    ));
+    assert_same('ArIns PmMg', $r['marca_titulo']);
+    assert_same('Assessoria de Relações Institucionais', $r['marca_subtitulo']);
+    assert_same(2, $r['estilo']);
+    assert_same(15, $r['marca_logo_id']);
+}
+
+function test_aparencia_marca_subtitulo_aceita_ate_100_caracteres() {
+    $r = Arins_Login_Aparencia::sanitizar(array('marca_subtitulo' => str_repeat('a', 150)));
+    assert_same(100, strlen($r['marca_subtitulo']));
+}
+
+function test_aparencia_marca_titulo_e_limitado_a_60_caracteres() {
+    $r = Arins_Login_Aparencia::sanitizar(array('marca_titulo' => str_repeat('a', 90)));
+    assert_same(60, strlen($r['marca_titulo']));
+}
