@@ -63,12 +63,12 @@ body.login #nav a { color: var(--arins-suave); text-decoration: none; }
 
 .arins-login-topo {
     position: relative;
-    height: 112px;
+    height: 72px;
     background: var(--arins-faixa);
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    padding-top: 16px;
+    padding-top: 20px;
     box-sizing: border-box;
     flex: 0 0 auto;
 }
@@ -91,7 +91,7 @@ body.login #nav a { color: var(--arins-suave); text-decoration: none; }
 .arins-login-topo img {
     position: relative;
     z-index: 1;
-    height: 100px;
+    height: 88px;
     max-width: 180px;
     width: auto;
     object-fit: contain;
@@ -101,7 +101,7 @@ body.login #nav a { color: var(--arins-suave); text-decoration: none; }
 
 .arins-login-conteudo {
     flex: 1 1 auto;
-    padding: 4.5rem 2.5rem 2rem;
+    padding: 5.5rem 2.5rem 2rem;
     box-sizing: border-box;
 }
 
