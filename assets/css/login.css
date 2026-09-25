@@ -59,41 +59,30 @@ body.login #nav a { color: var(--arins-suave); text-decoration: none; }
     .arins-login-painel { flex: 1 1 100%; }
 }
 
-/* ---- faixa dourada do topo, com tira de chevrons ---- */
+/* ---- faixa dourada do topo, com a barra de chevrons ----
+   Camadas (de cima para baixo), como no site de referência: a barra (SVG de
+   700x16) repetida na horizontal a partir de 116px; o dourado só até 124px, de
+   modo que a barra fica metade sobre o dourado e metade sobre o painel escuro;
+   e o fundo escuro. O brasão fica por cima de tudo, a 61px do topo. */
 
 .arins-login-topo {
     position: relative;
-    height: 72px;
-    background: var(--arins-faixa);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 20px;
-    box-sizing: border-box;
     flex: 0 0 auto;
-}
-
-/* Barra de chevrons (SVG de 700px, centrada); nas laterais, se o painel for mais largo, preto. */
-.arins-login-topo::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -16px;
-    height: 16px;
+    height: 132px;
     background:
-        url("../images/escudo-pmmg-decor.svg") center / 700px 16px no-repeat,
-        linear-gradient(#000, #000) left / calc((100% - 700px) / 2) 100% no-repeat,
-        linear-gradient(#000, #000) right / calc((100% - 700px) / 2) 100% no-repeat,
-        var(--arins-faixa);
+        url("../images/escudo-pmmg-decor.svg") center 116px repeat-x,
+        linear-gradient(var(--arins-faixa) 124px, transparent 124px),
+        var(--arins-painel);
 }
 
 .arins-login-topo img {
-    position: relative;
-    z-index: 1;
-    height: 88px;
-    max-width: 180px;
+    position: absolute;
+    top: 61px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 82px;
     width: auto;
+    max-width: 90%;
     object-fit: contain;
 }
 
@@ -101,7 +90,7 @@ body.login #nav a { color: var(--arins-suave); text-decoration: none; }
 
 .arins-login-conteudo {
     flex: 1 1 auto;
-    padding: 5.5rem 2.5rem 2rem;
+    padding: 5rem 2.5rem 2rem;
     box-sizing: border-box;
 }
 
