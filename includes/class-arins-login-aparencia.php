@@ -33,7 +33,17 @@ class Arins_Login_Aparencia {
             'exibir_voltar' => true,
             'cor_destaque' => '#dfca8c',
             'fundos' => array(),
+            'titulo' => 'ARINS PMMG',
         );
+    }
+
+    /** Texto puro (sem HTML), até 60 caracteres; vazio oculta o título. */
+    public static function sanitizar_titulo($valor, $padrao) {
+        if (!is_string($valor)) {
+            return $padrao;
+        }
+        $valor = trim(preg_replace('/\s+/', ' ', strip_tags($valor)));
+        return mb_substr($valor, 0, 60);
     }
 
     public static function sanitizar_cor($valor, $padrao) {
@@ -70,6 +80,7 @@ class Arins_Login_Aparencia {
             'exibir_voltar' => !empty($bruto['exibir_voltar']),
             'cor_destaque' => self::sanitizar_cor(isset($bruto['cor_destaque']) ? $bruto['cor_destaque'] : null, $padroes['cor_destaque']),
             'fundos' => self::sanitizar_ids(isset($bruto['fundos']) ? $bruto['fundos'] : array()),
+            'titulo' => self::sanitizar_titulo(isset($bruto['titulo']) ? $bruto['titulo'] : null, $padroes['titulo']),
         );
     }
 
@@ -251,6 +262,13 @@ JS
                         </ul>
                         <button type="button" class="button" id="arins-login-fundos-adicionar">Adicionar imagens</button>
                         <p class="description">Com uma imagem, ela fica fixa. Com várias, uma é sorteada a cada vez que a tela de login é aberta. Textos e brasões fazem parte da própria imagem.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row"><label for="arins-login-titulo">Título do painel</label></th>
+                    <td>
+                        <input type="text" class="regular-text" id="arins-login-titulo" maxlength="60" name="<?php echo $nome; ?>[titulo]" value="<?php echo esc_attr($v['titulo']); ?>">
+                        <p class="description">Texto acima dos campos de login. Deixe vazio para não exibir título.</p>
                     </td>
                 </tr>
                 <tr>

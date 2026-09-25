@@ -79,7 +79,9 @@ class Arins_Login_Tela {
     }
 
     public static function abrir_layout() {
-        $logo = Arins_Login_Aparencia::url_anexo((int) Arins_Login_Aparencia::valores()['logo_id']);
+        $v = Arins_Login_Aparencia::valores();
+        $logo = Arins_Login_Aparencia::url_anexo((int) $v['logo_id']);
+        $titulo = (string) $v['titulo'];
         ?>
         <div class="arins-login-wrap">
             <div class="arins-login-fundo" role="presentation"></div>
@@ -90,7 +92,9 @@ class Arins_Login_Tela {
                     <?php endif; ?>
                 </div>
                 <div class="arins-login-conteudo">
-                    <h2 class="arins-login-titulo">ARINS PMMG</h2>
+                    <?php if ($titulo !== '') : ?>
+                        <h2 class="arins-login-titulo"><?php echo esc_html($titulo); ?></h2>
+                    <?php endif; ?>
         <?php
     }
 

@@ -87,3 +87,25 @@ function test_aparencia_css_oculta_voltar_quando_nao_exibir() {
     assert_contains('.arins-login-rodape', Arins_Login_Aparencia::css_extra(array('exibir_voltar' => false)));
     assert_same('', Arins_Login_Aparencia::css_extra(array('exibir_voltar' => true)));
 }
+
+function test_aparencia_titulo_padrao_e_arins_pmmg() {
+    assert_same('ARINS PMMG', Arins_Login_Aparencia::padroes()['titulo']);
+}
+
+function test_aparencia_titulo_remove_html_e_espacos_extras() {
+    assert_same('Arins Login', Arins_Login_Aparencia::sanitizar_titulo("  <b>Arins</b>   Login 
+", 'X'));
+}
+
+function test_aparencia_titulo_e_limitado_a_60_caracteres() {
+    assert_same(60, strlen(Arins_Login_Aparencia::sanitizar_titulo(str_repeat('a', 100), 'X')));
+}
+
+function test_aparencia_titulo_vazio_e_permitido_e_nao_string_usa_padrao() {
+    assert_same('', Arins_Login_Aparencia::sanitizar_titulo('   ', 'X'));
+    assert_same('X', Arins_Login_Aparencia::sanitizar_titulo(array('a'), 'X'));
+}
+
+function test_aparencia_sanitizar_guarda_o_titulo() {
+    assert_same('Novo título', Arins_Login_Aparencia::sanitizar(array('titulo' => 'Novo título'))['titulo']);
+}
