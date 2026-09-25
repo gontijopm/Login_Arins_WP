@@ -39,7 +39,29 @@ class Arins_Login_Aparencia {
             'marca_logo_id' => 0,
             'marca_titulo' => 'Arins',
             'marca_subtitulo' => 'ASSESSORIA DE RELAÇÕES INSTITUCIONAIS',
+            'fonte_titulo' => 20,
+            'fonte_marca_titulo' => 36,
+            'fonte_marca_subtitulo' => 14,
+            'fonte_formulario' => 15,
         );
+    }
+
+    /** Limites (em px) dos tamanhos de fonte configuráveis. */
+    public static function limites_fonte() {
+        return array(
+            'fonte_titulo' => array(12, 48),
+            'fonte_marca_titulo' => array(16, 72),
+            'fonte_marca_subtitulo' => array(10, 32),
+            'fonte_formulario' => array(12, 24),
+        );
+    }
+
+    /** Inteiro em px dentro de [min, max]; vazio ou inválido volta ao padrão. */
+    public static function sanitizar_tamanho($valor, $padrao, $min, $max) {
+        if (!is_scalar($valor) || !preg_match('/^\d{1,3}$/', trim((string) $valor))) {
+            return $padrao;
+        }
+        return max($min, min($max, (int) $valor));
     }
 
     /** Estilo 1 (painel com faixa dourada) ou 2 (painel preto com a marca). */
@@ -95,7 +117,15 @@ class Arins_Login_Aparencia {
             'marca_logo_id' => (isset($bruto['marca_logo_id']) && is_scalar($bruto['marca_logo_id']) && ctype_digit((string) $bruto['marca_logo_id'])) ? (int) $bruto['marca_logo_id'] : 0,
             'marca_titulo' => self::sanitizar_titulo(isset($bruto['marca_titulo']) ? $bruto['marca_titulo'] : null, $padroes['marca_titulo']),
             'marca_subtitulo' => self::sanitizar_titulo(isset($bruto['marca_subtitulo']) ? $bruto['marca_subtitulo'] : null, $padroes['marca_subtitulo'], 100),
-        );
+        ) + self::sanitizar_fontes($bruto, $padroes);
+    }
+
+    private static function sanitizar_fontes($bruto, $padroes) {
+        $fontes = array();
+        foreach (self::limites_fonte() as $chave => $limite) {
+            $fontes[$chave] = self::sanitizar_tamanho(isset($bruto[$chave]) ? $bruto[$chave] : null, $padroes[$chave], $limite[0], $limite[1]);
+        }
+        return $fontes;
     }
 
     /** Escolhe um ID da lista a partir de um número aleatório; 0 se a lista é vazia. */
@@ -107,7 +137,12 @@ class Arins_Login_Aparencia {
     }
 
     public static function css_variaveis($v) {
-        return ':root{--arins-destaque:' . $v['cor_destaque'] . ';}';
+        $v = array_merge(self::padroes(), $v);
+        return ':root{--arins-destaque:' . $v['cor_destaque']
+            . ';--arins-fs-titulo:' . (int) $v['fonte_titulo'] . 'px'
+            . ';--arins-fs-marca-titulo:' . (int) $v['fonte_marca_titulo'] . 'px'
+            . ';--arins-fs-marca-subtitulo:' . (int) $v['fonte_marca_subtitulo'] . 'px'
+            . ';--arins-fs-form:' . (int) $v['fonte_formulario'] . 'px;}';
     }
 
     /** Imagem de fundo sorteada; vazio (ou URL com aspas) deixa o fundo escuro liso. */
@@ -311,6 +346,26 @@ JS
                     <td>
                         <input type="text" class="large-text" id="arins-login-marca-subtitulo" maxlength="100" name="<?php echo $nome; ?>[marca_subtitulo]" value="<?php echo esc_attr($v['marca_subtitulo']); ?>">
                         <p class="description">Maiúsculas e minúsculas são exibidas exatamente como digitadas.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Tamanho das fontes <em>(px)</em></th>
+                    <td>
+                        <?php
+                        $rotulos = array(
+                            'fonte_titulo' => 'Título do painel (Estilo 1)',
+                            'fonte_marca_titulo' => 'Título da marca (Estilo 2)',
+                            'fonte_marca_subtitulo' => 'Subtítulo da marca (Estilo 2)',
+                            'fonte_formulario' => 'Campos, botão e links do formulário',
+                        );
+                        foreach (self::limites_fonte() as $chave => $limite) : ?>
+                            <p>
+                                <label>
+                                    <input type="number" class="small-text" min="<?php echo (int) $limite[0]; ?>" max="<?php echo (int) $limite[1]; ?>" step="1" name="<?php echo $nome; ?>[<?php echo esc_attr($chave); ?>]" value="<?php echo esc_attr((int) $v[$chave]); ?>">
+                                    <?php echo esc_html($rotulos[$chave]); ?> <span class="description">(<?php echo (int) $limite[0]; ?> a <?php echo (int) $limite[1]; ?>)</span>
+                                </label>
+                            </p>
+                        <?php endforeach; ?>
                     </td>
                 </tr>
                 <tr>

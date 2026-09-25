@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Login Arins
  * Description: Tela de login personalizada e controle da barra de administração da Assessoria de Relações Institucionais da PMMG.
- * Version: 0.4.0
+ * Version: 0.4.1
  * Author: Arins/PMMG
  * Requires at least: 6.6
  * Requires PHP: 7.4
@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ARINS_LOGIN_VERSION', '0.4.0');
+define('ARINS_LOGIN_VERSION', '0.4.1');
 define('ARINS_LOGIN_FILE', __FILE__);
 define('ARINS_LOGIN_DIR', plugin_dir_path(__FILE__));
 define('ARINS_LOGIN_URL', plugin_dir_url(__FILE__));

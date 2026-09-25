@@ -152,3 +152,34 @@ function test_aparencia_marca_titulo_e_limitado_a_60_caracteres() {
     $r = Arins_Login_Aparencia::sanitizar(array('marca_titulo' => str_repeat('a', 90)));
     assert_same(60, strlen($r['marca_titulo']));
 }
+
+function test_aparencia_tamanho_dentro_do_limite_e_aceito() {
+    assert_same(40, Arins_Login_Aparencia::sanitizar_tamanho('40', 36, 16, 72));
+}
+
+function test_aparencia_tamanho_fora_do_limite_e_ajustado() {
+    assert_same(72, Arins_Login_Aparencia::sanitizar_tamanho('200', 36, 16, 72));
+    assert_same(16, Arins_Login_Aparencia::sanitizar_tamanho('3', 36, 16, 72));
+}
+
+function test_aparencia_tamanho_invalido_ou_vazio_volta_ao_padrao() {
+    assert_same(36, Arins_Login_Aparencia::sanitizar_tamanho('', 36, 16, 72));
+    assert_same(36, Arins_Login_Aparencia::sanitizar_tamanho('abc', 36, 16, 72));
+    assert_same(36, Arins_Login_Aparencia::sanitizar_tamanho('-5', 36, 16, 72));
+    assert_same(36, Arins_Login_Aparencia::sanitizar_tamanho('20px', 36, 16, 72));
+    assert_same(36, Arins_Login_Aparencia::sanitizar_tamanho(array(20), 36, 16, 72));
+}
+
+function test_aparencia_sanitizar_inclui_as_quatro_fontes() {
+    $r = Arins_Login_Aparencia::sanitizar(array('fonte_marca_titulo' => '48', 'fonte_formulario' => '99'));
+    assert_same(48, $r['fonte_marca_titulo']);
+    assert_same(24, $r['fonte_formulario']);
+    assert_same(20, $r['fonte_titulo']);
+    assert_same(14, $r['fonte_marca_subtitulo']);
+}
+
+function test_aparencia_css_variaveis_inclui_tamanhos_das_fontes() {
+    $css = Arins_Login_Aparencia::css_variaveis(array('fonte_marca_titulo' => 50));
+    assert_contains('--arins-fs-marca-titulo:50px', $css);
+    assert_contains('--arins-fs-form:15px', $css);
+}

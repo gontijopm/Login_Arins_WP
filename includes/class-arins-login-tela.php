@@ -146,8 +146,14 @@ class Arins_Login_Tela {
         (function () {
             var usuario = document.getElementById('user_login');
             var senha = document.getElementById('user_pass');
-            if (usuario) { usuario.setAttribute('placeholder', 'Usuário'); }
-            if (senha) { senha.setAttribute('placeholder', 'Senha'); }
+            if (usuario) {
+                usuario.setAttribute('placeholder', 'Usuário');
+                usuario.parentNode.classList.add('arins-campo-usuario');
+            }
+            if (senha) {
+                senha.setAttribute('placeholder', 'Senha');
+                senha.parentNode.classList.add('arins-campo-senha');
+            }
         })();
         </script>
         <?php
