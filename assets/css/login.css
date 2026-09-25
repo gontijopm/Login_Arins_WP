@@ -6,6 +6,7 @@
     --arins-ink: #211f1a;
     --arins-muted: #665f52;
     --arins-line: #d6d0c3;
+    --arins-card: #fff;
 }
 
 @font-face { font-family: Rawline; src: url("../fonts/rawline-400.ttf") format("truetype"); font-weight: 400; font-display: swap; }
@@ -27,50 +28,12 @@ body.login #login {
 .arins-login-wrap {
     display: flex;
     min-height: 100vh;
-    align-items: stretch;
-}
-
-.arins-login-aside {
-    display: none;
-    flex: 1 1 55%;
-    background: var(--arins-graphite);
-    color: var(--arins-paper);
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    align-items: flex-start;
-    padding: 4rem;
-    box-sizing: border-box;
-}
-
-.arins-login-aside img {
-    width: 96px;
-    height: 96px;
-    margin-bottom: 2rem;
-}
-
-.arins-login-aside p {
-    font-size: 1.5rem;
-    font-weight: 700;
-    line-height: 1.3;
-    max-width: 26rem;
-    margin: 0 0 2rem;
-}
-
-.arins-login-linha {
-    width: 6rem;
-    height: 3px;
-    background: linear-gradient(90deg, var(--arins-gold-dark), var(--arins-gold), var(--arins-gold-dark));
-    background-size: 200% 100%;
-    animation: arins-login-brilho 3s ease-in-out infinite;
-}
-
-@keyframes arins-login-brilho {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 200% 50%; }
 }
 
 .arins-login-main {
-    flex: 1 1 45%;
+    flex: 1 1 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -79,20 +42,19 @@ body.login #login {
     box-sizing: border-box;
 }
 
-@media (min-width: 900px) {
-    .arins-login-aside { display: flex; }
-}
-
 body.login h1 a {
     background-image: url("../images/escudo-pmmg-mono-gold.png");
-    background-size: 80px;
-    width: 80px;
-    height: 80px;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 220px;
+    max-width: 100%;
+    height: 100px;
     margin: 0 auto 1.5rem;
 }
 
 body.login form {
-    background: #fff;
+    background: var(--arins-card);
     border: 1px solid var(--arins-line);
     border-radius: 8px;
     box-shadow: 0 10px 30px rgba(20, 18, 14, 0.08);
@@ -107,7 +69,6 @@ body.login form {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .arins-login-linha { animation: none; }
     body.login form { animation: none; opacity: 1; transform: none; }
 }
 
@@ -115,6 +76,15 @@ body.login label {
     color: var(--arins-ink);
     font-weight: 600;
 }
+
+body.login #nav a,
+body.login #backtoblog,
+.arins-login-rodape a {
+    color: var(--arins-ink);
+}
+
+/* O link nativo "Ir para ..." duplica o "Voltar para a Página Arins". */
+body.login #backtoblog { display: none; }
 
 body.login input[type="text"],
 body.login input[type="password"] {
@@ -152,6 +122,5 @@ body.login .button-primary:focus {
 }
 
 .arins-login-rodape a {
-    color: var(--arins-muted);
     font-size: 0.85rem;
 }

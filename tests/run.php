@@ -12,6 +12,7 @@
 
 define('ABSPATH', __DIR__ . '/');
 
+require __DIR__ . '/../includes/class-arins-login-aparencia.php';
 require __DIR__ . '/../includes/class-arins-login-barra-admin.php';
 require __DIR__ . '/../includes/class-arins-login-tela.php';
 

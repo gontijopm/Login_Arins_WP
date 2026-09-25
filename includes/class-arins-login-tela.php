@@ -1,7 +1,7 @@
 <?php
 /**
- * Reestiliza wp-login.php com a identidade visual da Pagina_Arins: layout
- * em duas colunas, logo, textos e link do rodapé.
+ * Reestiliza wp-login.php com a identidade visual da Pagina_Arins: formulário
+ * centralizado, logo, textos e link do rodapé.
  */
 
 if (!defined('ABSPATH')) {
@@ -14,6 +14,7 @@ class Arins_Login_Tela {
         add_action('login_enqueue_scripts', array(__CLASS__, 'estilos'));
         add_filter('login_headerurl', array(__CLASS__, 'url_cabecalho'));
         add_filter('login_headertext', array(__CLASS__, 'texto_cabecalho'));
+        add_filter('login_display_language_dropdown', '__return_false');
         add_filter('wp_login_errors', array(__CLASS__, 'mensagens_erro'), 10, 2);
         add_action('login_header', array(__CLASS__, 'abrir_layout'));
         add_action('login_footer', array(__CLASS__, 'fechar_layout'));
@@ -73,18 +74,15 @@ class Arins_Login_Tela {
     public static function abrir_layout() {
         ?>
         <div class="arins-login-wrap">
-            <div class="arins-login-aside">
-                <img src="<?php echo esc_url(ARINS_LOGIN_URL . 'assets/images/escudo-pmmg-mono-gold.png'); ?>" alt="Escudo da PMMG" width="96" height="96">
-                <p>Relações institucionais que aproximam a PMMG da sociedade.</p>
-                <div class="arins-login-linha"></div>
-            </div>
             <div class="arins-login-main">
         <?php
     }
 
     public static function fechar_layout() {
         ?>
+                <?php if (Arins_Login_Aparencia::exibir_voltar()) : ?>
                 <p class="arins-login-rodape"><a href="<?php echo esc_url(home_url('/')); ?>">Voltar para a Página Arins</a></p>
+                <?php endif; ?>
             </div>
         </div>
         <?php
