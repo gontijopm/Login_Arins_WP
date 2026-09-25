@@ -1058,5 +1058,11 @@ git commit -m "Adiciona o build do pacote de distribuição"
 After uploading `dist/arins-login.zip` in **Plugins → Adicionar plugin → Enviar plugin** on `arins.policiamilitar.mg.gov.br` and activating it:
 - Open `/wp-login.php` on desktop: confirm the two-column layout, PMMG shield, gold shimmer line, and that a failed login shows exactly "Usuário institucional ou senha inválidos." without naming the field.
 - Open `/wp-login.php` on a narrow (mobile-width) browser window: confirm it collapses to a single column.
+- Confirm the footer link ("Voltar para a Página Arins") sits below the login card, not beside it.
+- Try the lost-password screen with an unknown username: confirm it does NOT show the institutional credentials message (that flow has its own, unrelated errors, which this plugin leaves untouched).
+- Follow an expired password-reset link: confirm the "link expired" message shows as-is, not the institutional credentials message.
+- If the site has more than one language installed, confirm the language switcher (shown below the login form) doesn't get the white-card styling meant for the login form itself.
 - In **Configurações → Login Arins**, mark one role to hide the admin bar, save, and log in as a user with only that role: confirm the black admin bar is gone on the front end. Log in as an administrator: confirm the bar still shows.
 - Confirm no PHP notices/warnings appear (check the site's PHP error log if accessible) for a logged-out visitor browsing the front end.
+
+**Note on the GitHub updater:** until `Login_Arins_WP` is published on GitHub with a release workflow (see the comment atop `includes/class-arins-login-atualizador.php`, corrected after the final review), configuring a token in **Configurações → Login Arins** will not surface "Atualizar agora" — there is nothing for it to find yet. This is the same deferred step already pending for `Banco_Horas_WP`.

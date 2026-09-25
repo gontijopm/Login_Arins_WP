@@ -14,7 +14,7 @@ class Arins_Login_Tela {
         add_action('login_enqueue_scripts', array(__CLASS__, 'estilos'));
         add_filter('login_headerurl', array(__CLASS__, 'url_cabecalho'));
         add_filter('login_headertext', array(__CLASS__, 'texto_cabecalho'));
-        add_filter('login_errors', array(__CLASS__, 'mensagem_erro'));
+        add_filter('wp_login_errors', array(__CLASS__, 'mensagens_erro'), 10, 2);
         add_action('login_header', array(__CLASS__, 'abrir_layout'));
         add_action('login_footer', array(__CLASS__, 'fechar_layout'));
     }
@@ -36,12 +36,38 @@ class Arins_Login_Tela {
         return 'Usuário institucional ou senha inválidos.';
     }
 
-    /** Filtro login_errors. Pura: não chama funções do WordPress. */
-    public static function mensagem_erro($mensagem_original) {
-        if ($mensagem_original === '') {
-            return $mensagem_original;
+    /** Códigos de erro do WordPress tratados como "credenciais inválidas". */
+    public static function codigos_credenciais() {
+        return array('invalid_username', 'invalid_email', 'incorrect_password');
+    }
+
+    /**
+     * Dos códigos de erro presentes, quais devem virar a mensagem
+     * institucional única. Pura: sem chamadas ao WordPress, por isso é
+     * testada sem carregar o WordPress (tests/test-tela.php).
+     */
+    public static function filtrar_codigos_erro($codigos) {
+        return array_values(array_intersect($codigos, self::codigos_credenciais()));
+    }
+
+    /**
+     * Filtro wp_login_errors: troca só os erros de credencial pela mensagem
+     * institucional única. Outros erros (cookie bloqueado, link de
+     * redefinição de senha expirado, etc.) passam intactos — só o
+     * filtrar_codigos_erro() acima decide isso, e é pura.
+     */
+    public static function mensagens_erro($errors, $redirect_to = '') {
+        if (!is_wp_error($errors)) {
+            return $errors;
         }
-        return '<p class="message">' . self::texto_erro() . '</p>';
+        $codigos = self::filtrar_codigos_erro($errors->get_error_codes());
+        foreach ($codigos as $codigo) {
+            $errors->remove($codigo);
+        }
+        if (!empty($codigos) && !in_array('arins_login_credenciais', $errors->get_error_codes(), true)) {
+            $errors->add('arins_login_credenciais', self::texto_erro());
+        }
+        return $errors;
     }
 
     public static function abrir_layout() {

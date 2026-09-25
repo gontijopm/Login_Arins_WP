@@ -72,6 +72,7 @@ body.login #login {
 .arins-login-main {
     flex: 1 1 45%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 2rem;

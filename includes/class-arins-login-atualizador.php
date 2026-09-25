@@ -3,9 +3,17 @@
  * Atualização do plugin pelo repositório privado do GitHub, no mesmo modelo
  * do atualizador do Banco de Horas e da Pagina_Arins.
  *
- * Uma tag vX.Y.Z publica a release com o ZIP (.github/workflows/release.yml).
- * O WordPress consulta a última release, compara com ARINS_LOGIN_VERSION e
- * mostra "Atualizar agora" em Plugins. O download usa o mesmo token.
+ * Diferente do Banco de Horas, este repositório ainda não tem um workflow
+ * de release automático (.github/workflows/release.yml) nem foi publicado
+ * no GitHub. Até que isso exista, publicar uma versão é manual: gerar o ZIP
+ * com tools/build-plugin.ps1, renomear para "Login_Arins_WP-X.Y.Z.zip" (é
+ * esse nome, e só esse, que ultima_release() reconhece como pacote válido)
+ * e anexar a um release do GitHub com a tag "vX.Y.Z". Sem isso, o
+ * WordPress nunca mostra "Atualizar agora", mesmo com o token configurado.
+ *
+ * Quando o workflow existir, o WordPress passa a consultar a última release,
+ * comparar com ARINS_LOGIN_VERSION e mostrar "Atualizar agora" em Plugins.
+ * O download usa o mesmo token.
  *
  * O token (fino, só leitura em Contents e Metadata) vem, nesta ordem:
  * - da constante ARINS_LOGIN_GITHUB_TOKEN no wp-config.php;
