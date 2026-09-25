@@ -17,6 +17,7 @@ class Arins_Login_Tela {
         add_filter('login_display_language_dropdown', '__return_false');
         add_filter('wp_login_errors', array(__CLASS__, 'mensagens_erro'), 10, 2);
         add_action('login_header', array(__CLASS__, 'abrir_layout'));
+        add_action('login_form', array(__CLASS__, 'link_recuperar_senha'));
         add_action('login_footer', array(__CLASS__, 'fechar_layout'));
     }
 
@@ -72,19 +73,46 @@ class Arins_Login_Tela {
     }
 
     public static function abrir_layout() {
+        $v = Arins_Login_Aparencia::valores();
+        $logo = Arins_Login_Aparencia::url_anexo((int) $v['logo_id']);
         ?>
         <div class="arins-login-wrap">
-            <div class="arins-login-main">
+            <div class="arins-login-fundo" role="presentation"></div>
+            <div class="arins-login-painel">
+                <div class="arins-login-topo">
+                    <?php if ($logo !== '') : ?>
+                        <img src="<?php echo esc_url($logo); ?>" alt="<?php echo esc_attr(get_bloginfo('name')); ?>">
+                    <?php endif; ?>
+                </div>
+                <div class="arins-login-conteudo">
+                    <h2 class="arins-login-titulo">ARINS PMMG</h2>
+        <?php
+    }
+
+    /** "Esqueci minha senha" ao lado do botão Entrar, dentro do formulário. */
+    public static function link_recuperar_senha() {
+        if (!Arins_Login_Aparencia::exibir_perdeu_senha()) {
+            return;
+        }
+        ?>
+        <a class="arins-login-esqueci" href="<?php echo esc_url(wp_lostpassword_url()); ?>">Esqueci minha senha</a>
         <?php
     }
 
     public static function fechar_layout() {
         ?>
-                <?php if (Arins_Login_Aparencia::exibir_voltar()) : ?>
-                <p class="arins-login-rodape"><a href="<?php echo esc_url(home_url('/')); ?>">Voltar para a Página Arins</a></p>
-                <?php endif; ?>
+                    <p class="arins-login-rodape"><a href="<?php echo esc_url(home_url('/')); ?>">Voltar para a Página Arins</a></p>
+                </div>
             </div>
         </div>
+        <script>
+        (function () {
+            var usuario = document.getElementById('user_login');
+            var senha = document.getElementById('user_pass');
+            if (usuario) { usuario.setAttribute('placeholder', 'Usuário'); }
+            if (senha) { senha.setAttribute('placeholder', 'Senha'); }
+        })();
+        </script>
         <?php
     }
 }

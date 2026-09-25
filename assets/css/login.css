@@ -1,12 +1,15 @@
 :root {
-    --arins-graphite: #14120e;
-    --arins-gold: #c9a227;
-    --arins-gold-dark: #80681e;
-    --arins-paper: #f6f5f1;
-    --arins-ink: #211f1a;
-    --arins-muted: #665f52;
-    --arins-line: #d6d0c3;
-    --arins-card: #fff;
+    --arins-destaque: #dfca8c;
+    --arins-faixa: #a89562;
+    --arins-painel: #111111;
+    --arins-campo: #1b2233;
+    --arins-borda: #2c3448;
+    --arins-texto: #e8e4d8;
+    --arins-suave: #a8a294;
+}
+
+@supports (color: color-mix(in srgb, red, blue)) {
+    :root { --arins-faixa: color-mix(in srgb, var(--arins-destaque) 70%, #000); }
 }
 
 @font-face { font-family: Rawline; src: url("../fonts/rawline-400.ttf") format("truetype"); font-weight: 400; font-display: swap; }
@@ -15,112 +18,269 @@
 @font-face { font-family: Rawline; src: url("../fonts/rawline-900.ttf") format("truetype"); font-weight: 900; font-display: swap; }
 
 body.login {
-    background: var(--arins-paper);
+    background: var(--arins-painel);
+    color: var(--arins-texto);
     font-family: Rawline, sans-serif;
+    min-height: 100vh;
 }
 
-body.login #login {
-    padding: 0;
-    width: 100%;
-    max-width: 360px;
-}
+body.login h1,
+body.login #backtoblog,
+body.login .language-switcher,
+body.login-action-login #nav { display: none; }
+
+/* nas telas de recuperação/redefinição, o link de volta ao login continua */
+body.login #nav { margin: 1.5rem 0 0; padding: 0; }
+body.login #nav a { color: var(--arins-suave); text-decoration: none; }
+
+/* ---- estrutura: foto à esquerda, painel escuro à direita ---- */
 
 .arins-login-wrap {
     display: flex;
     min-height: 100vh;
-    align-items: center;
-    justify-content: center;
 }
 
-.arins-login-main {
-    flex: 1 1 100%;
+.arins-login-fundo {
+    flex: 1 1 70%;
+    background: #1a1a1a center / cover no-repeat;
+}
+
+.arins-login-painel {
+    flex: 0 0 30%;
+    min-width: 340px;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    background: var(--arins-painel);
+}
+
+@media (max-width: 899px) {
+    .arins-login-fundo { display: none; }
+    .arins-login-painel { flex: 1 1 100%; }
+}
+
+/* ---- faixa dourada do topo, com tira de chevrons ---- */
+
+.arins-login-topo {
+    position: relative;
+    height: 112px;
+    background: var(--arins-faixa);
+    display: flex;
     justify-content: center;
-    padding: 2rem;
+    align-items: flex-start;
+    padding-top: 16px;
+    box-sizing: border-box;
+    flex: 0 0 auto;
+}
+
+.arins-login-topo::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -16px;
+    height: 16px;
+    background:
+        repeating-linear-gradient(-60deg, transparent 0 8px, var(--arins-faixa) 8px 14px),
+        #000;
+}
+
+.arins-login-topo img {
+    position: relative;
+    z-index: 1;
+    max-width: 180px;
+    max-height: 100px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+/* ---- conteúdo do painel ---- */
+
+.arins-login-conteudo {
+    flex: 1 1 auto;
+    padding: 4.5rem 2.5rem 2rem;
     box-sizing: border-box;
 }
 
-body.login h1 a {
-    background-image: url("../images/escudo-pmmg-mono-gold.png");
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    width: 220px;
-    max-width: 100%;
-    height: 100px;
-    margin: 0 auto 1.5rem;
+.arins-login-titulo {
+    margin: 0 0 3rem;
+    color: var(--arins-texto);
+    font-size: 1.25rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+body.login #login {
+    width: 100%;
+    max-width: 360px;
+    padding: 0;
+    margin: 0;
 }
 
 body.login form {
-    background: var(--arins-card);
-    border: 1px solid var(--arins-line);
-    border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(20, 18, 14, 0.08);
-    padding: 2rem;
-    opacity: 0;
-    transform: translateY(8px);
-    animation: arins-login-entrada 0.4s ease-out forwards;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
 }
 
-@keyframes arins-login-entrada {
-    to { opacity: 1; transform: translateY(0); }
+body.login form > p:not(.submit):not(.forgetmenot),
+body.login form .user-pass-wrap {
+    width: 100%;
+    margin: 0 0 1rem;
 }
 
-@media (prefers-reduced-motion: reduce) {
-    body.login form { animation: none; opacity: 1; transform: none; }
+/* rótulos só para leitores de tela: os campos usam placeholder */
+body.login form label[for="user_login"],
+body.login form label[for="user_pass"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
 }
 
-body.login label {
-    color: var(--arins-ink);
-    font-weight: 600;
-}
-
-body.login #nav a,
-body.login #backtoblog,
-.arins-login-rodape a {
-    color: var(--arins-ink);
-}
-
-/* O link nativo "Ir para ..." duplica o "Voltar para a Página Arins". */
-body.login #backtoblog { display: none; }
-
-body.login input[type="text"],
-body.login input[type="password"] {
-    border: 1px solid var(--arins-line);
+body.login form input[type="text"],
+body.login form input[type="password"] {
+    width: 100%;
+    height: 48px;
+    margin: 0;
+    padding: 0 3rem 0 3rem;
+    background-color: var(--arins-campo);
+    background-repeat: no-repeat;
+    background-position: 1rem center;
+    background-size: 20px;
+    border: 1px solid var(--arins-borda);
     border-radius: 4px;
+    color: var(--arins-texto);
     font-family: Rawline, sans-serif;
+    font-size: 0.95rem;
+    box-shadow: none;
 }
 
-body.login input[type="text"]:focus,
-body.login input[type="password"]:focus {
-    border-color: var(--arins-gold);
-    box-shadow: 0 0 0 1px var(--arins-gold);
+body.login form #user_login {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e8e4d8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='4'/%3E%3Cpath d='M4 21c0-4 4-6 8-6s8 2 8 6'/%3E%3C/svg%3E");
+}
+
+body.login form #user_pass {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e8e4d8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='11' width='14' height='10' rx='2'/%3E%3Cpath d='M8 11V7a4 4 0 0 1 8 0v4'/%3E%3C/svg%3E");
+}
+
+body.login form input::placeholder { color: var(--arins-suave); opacity: 1; }
+
+body.login form input[type="text"]:focus,
+body.login form input[type="password"]:focus {
+    border-color: var(--arins-destaque);
+    box-shadow: 0 0 0 1px var(--arins-destaque);
+    outline: 0;
+}
+
+body.login form input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 100px var(--arins-campo) inset;
+    -webkit-text-fill-color: var(--arins-texto);
+}
+
+body.login form .wp-pwd { position: relative; }
+
+body.login form .wp-pwd .button.wp-hide-pw {
+    top: 0;
+    right: 0;
+    height: 48px;
+    width: 48px;
+    color: var(--arins-texto);
+}
+
+body.login form .wp-pwd .button.wp-hide-pw:hover,
+body.login form .wp-pwd .button.wp-hide-pw:focus {
+    color: var(--arins-destaque);
+    background: transparent;
+    box-shadow: none;
+    border-color: transparent;
+}
+
+/* ---- botão Entrar, link de senha, lembrar-me ---- */
+
+body.login form .submit {
+    order: 2;
+    margin: 0;
+    float: none;
+}
+
+body.login form .arins-login-esqueci {
+    order: 3;
+    color: var(--arins-suave);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+body.login form .arins-login-esqueci:hover { color: var(--arins-destaque); }
+
+body.login form .forgetmenot {
+    order: 4;
+    width: 100%;
+    margin: 1.25rem 0 0;
+    float: none;
+    color: var(--arins-suave);
+    font-size: 0.85rem;
+}
+
+body.login form .forgetmenot input[type="checkbox"] {
+    background: var(--arins-campo);
+    border-color: var(--arins-borda);
 }
 
 body.login .button-primary {
-    background: var(--arins-graphite);
-    border-color: var(--arins-graphite);
-    text-shadow: none;
-    box-shadow: none;
-    border-radius: 4px;
+    min-width: 88px;
+    height: 40px;
+    padding: 0 1.25rem;
+    background: var(--arins-destaque);
+    border: 0;
+    border-radius: 999px;
+    color: #14120e;
     font-family: Rawline, sans-serif;
     font-weight: 600;
+    text-shadow: none;
+    box-shadow: none;
 }
 
 body.login .button-primary:hover,
 body.login .button-primary:focus {
-    background: var(--arins-gold);
-    border-color: var(--arins-gold-dark);
-    color: var(--arins-graphite);
+    background: var(--arins-texto);
+    color: #14120e;
+    box-shadow: none;
 }
 
+/* ---- mensagens ---- */
+
+body.login .message,
+body.login #login_error,
+body.login .success {
+    margin: 0 0 1.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--arins-campo);
+    border: 0;
+    border-left: 4px solid var(--arins-destaque);
+    color: var(--arins-texto);
+    box-shadow: none;
+}
+
+body.login #login_error { border-left-color: #d9534f; }
+
 .arins-login-rodape {
-    margin-top: 1.5rem;
-    text-align: center;
+    margin: 2.5rem 0 0;
 }
 
 .arins-login-rodape a {
+    color: var(--arins-suave);
     font-size: 0.85rem;
+    text-decoration: none;
 }
+
+.arins-login-rodape a:hover { color: var(--arins-destaque); }

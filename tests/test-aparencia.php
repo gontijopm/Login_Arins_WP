@@ -1,7 +1,7 @@
 <?php
 /**
- * Lógica pura da aparência da tela de login: cores hexadecimais, logo,
- * opções de ocultar links e as variáveis CSS geradas.
+ * Lógica pura da aparência da tela de login: cor de destaque, logo, imagens
+ * de fundo (sorteio), opções de ocultar links e o CSS gerado.
  */
 
 function test_aparencia_cor_valida_e_normalizada_para_minuscula() {
@@ -24,14 +24,14 @@ function test_aparencia_sanitizar_aceita_valores_validos() {
         'logo_id' => '42',
         'ocultar_perdeu_senha' => '1',
         'exibir_voltar' => '1',
-        'cor_pagina' => '#FFFFFF',
-        'cor_cartao' => '#eeeeee',
-        'cor_texto' => '#000000',
+        'cor_destaque' => '#DFCA8C',
+        'fundos' => array('7', '9'),
     ));
     assert_same(42, $r['logo_id']);
     assert_same(true, $r['ocultar_perdeu_senha']);
     assert_same(true, $r['exibir_voltar']);
-    assert_same('#ffffff', $r['cor_pagina']);
+    assert_same('#dfca8c', $r['cor_destaque']);
+    assert_same(array(7, 9), $r['fundos']);
 }
 
 function test_aparencia_caixa_desmarcada_vira_false() {
@@ -45,32 +45,45 @@ function test_aparencia_logo_id_invalido_vira_zero() {
     assert_same(0, Arins_Login_Aparencia::sanitizar(array('logo_id' => 'abc'))['logo_id']);
 }
 
-function test_aparencia_css_variaveis_usa_as_tres_cores() {
-    $css = Arins_Login_Aparencia::css_variaveis(array(
-        'cor_pagina' => '#111111', 'cor_cartao' => '#222222', 'cor_texto' => '#333333',
-    ));
-    assert_contains('--arins-paper:#111111', $css);
-    assert_contains('--arins-card:#222222', $css);
-    assert_contains('--arins-ink:#333333', $css);
+function test_aparencia_fundos_remove_invalidos_e_duplicados() {
+    $r = Arins_Login_Aparencia::sanitizar_ids(array('7', 'x', '-1', '0', '7', array(3), '12'));
+    assert_same(array(7, 12), $r);
 }
 
-function test_aparencia_css_logo_vazio_nao_gera_regra() {
-    assert_same('', Arins_Login_Aparencia::css_logo(''));
+function test_aparencia_fundos_nao_array_vira_lista_vazia() {
+    assert_same(array(), Arins_Login_Aparencia::sanitizar_ids('7'));
 }
 
-function test_aparencia_css_logo_gera_regra_com_url() {
-    assert_contains('url("https://x.test/logo.png")', Arins_Login_Aparencia::css_logo('https://x.test/logo.png'));
+function test_aparencia_escolher_fundo_lista_vazia_devolve_zero() {
+    assert_same(0, Arins_Login_Aparencia::escolher_fundo(array(), 5));
 }
 
-function test_aparencia_css_logo_recusa_url_com_aspas() {
-    assert_same('', Arins_Login_Aparencia::css_logo('https://x.test/a".png'));
+function test_aparencia_escolher_fundo_uma_imagem_sempre_ela() {
+    assert_same(7, Arins_Login_Aparencia::escolher_fundo(array(7), 123));
 }
 
-function test_aparencia_css_ocultar_perdeu_senha() {
-    assert_contains('#nav', Arins_Login_Aparencia::css_extra(array('ocultar_perdeu_senha' => true, 'exibir_voltar' => true)));
-    assert_same(false, strpos(Arins_Login_Aparencia::css_extra(array('ocultar_perdeu_senha' => false, 'exibir_voltar' => true)), '#nav') !== false);
+function test_aparencia_escolher_fundo_usa_o_sorteio_dentro_da_lista() {
+    assert_same(9, Arins_Login_Aparencia::escolher_fundo(array(7, 9, 12), 1));
+    assert_same(7, Arins_Login_Aparencia::escolher_fundo(array(7, 9, 12), 3));
+}
+
+function test_aparencia_css_variaveis_usa_cor_de_destaque() {
+    assert_contains('--arins-destaque:#111111', Arins_Login_Aparencia::css_variaveis(array('cor_destaque' => '#111111')));
+}
+
+function test_aparencia_css_fundo_vazio_nao_gera_regra() {
+    assert_same('', Arins_Login_Aparencia::css_fundo(''));
+}
+
+function test_aparencia_css_fundo_gera_regra_com_url() {
+    assert_contains('url("https://x.test/f.jpg")', Arins_Login_Aparencia::css_fundo('https://x.test/f.jpg'));
+}
+
+function test_aparencia_css_fundo_recusa_url_com_aspas() {
+    assert_same('', Arins_Login_Aparencia::css_fundo('https://x.test/a".png'));
 }
 
 function test_aparencia_css_oculta_voltar_quando_nao_exibir() {
-    assert_contains('.arins-login-rodape', Arins_Login_Aparencia::css_extra(array('ocultar_perdeu_senha' => false, 'exibir_voltar' => false)));
+    assert_contains('.arins-login-rodape', Arins_Login_Aparencia::css_extra(array('exibir_voltar' => false)));
+    assert_same('', Arins_Login_Aparencia::css_extra(array('exibir_voltar' => true)));
 }
