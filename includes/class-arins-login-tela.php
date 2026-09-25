@@ -15,6 +15,7 @@ class Arins_Login_Tela {
         add_filter('login_headerurl', array(__CLASS__, 'url_cabecalho'));
         add_filter('login_headertext', array(__CLASS__, 'texto_cabecalho'));
         add_filter('login_display_language_dropdown', '__return_false');
+        add_filter('gettext', array(__CLASS__, 'texto_botao'), 10, 2);
         add_filter('wp_login_errors', array(__CLASS__, 'mensagens_erro'), 10, 2);
         add_action('login_header', array(__CLASS__, 'abrir_layout'));
         add_action('login_form', array(__CLASS__, 'link_recuperar_senha'));
@@ -23,6 +24,11 @@ class Arins_Login_Tela {
 
     public static function estilos() {
         wp_enqueue_style('arins-login', ARINS_LOGIN_URL . 'assets/css/login.css', array(), ARINS_LOGIN_VERSION);
+    }
+
+    /** O botão do formulário de login passa de "Acessar" para "Entrar". */
+    public static function texto_botao($traducao, $original) {
+        return $original === 'Log In' ? 'Entrar' : $traducao;
     }
 
     public static function url_cabecalho() {
@@ -73,8 +79,7 @@ class Arins_Login_Tela {
     }
 
     public static function abrir_layout() {
-        $v = Arins_Login_Aparencia::valores();
-        $logo = Arins_Login_Aparencia::url_anexo((int) $v['logo_id']);
+        $logo = Arins_Login_Aparencia::url_anexo((int) Arins_Login_Aparencia::valores()['logo_id']);
         ?>
         <div class="arins-login-wrap">
             <div class="arins-login-fundo" role="presentation"></div>
