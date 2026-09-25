@@ -173,9 +173,21 @@ body.login form input[type="password"]:focus {
     outline: 0;
 }
 
-body.login form input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 100px var(--arins-campo) inset;
-    -webkit-text-fill-color: var(--arins-texto);
+/* O navegador pinta o preenchimento automático (e a pré-visualização da
+   senha salva) de azul-claro; força o fundo e o texto do formulário escuro. */
+body.login form input[type="text"],
+body.login form input[type="password"] { color-scheme: dark; }
+
+body.login form input:-webkit-autofill,
+body.login form input:-webkit-autofill:hover,
+body.login form input:-webkit-autofill:focus,
+body.login form input:-webkit-autofill:active,
+body.login form input:autofill {
+    -webkit-box-shadow: 0 0 0 100px var(--arins-campo) inset !important;
+    box-shadow: 0 0 0 100px var(--arins-campo) inset !important;
+    -webkit-text-fill-color: var(--arins-texto) !important;
+    caret-color: var(--arins-texto);
+    transition: background-color 9999s ease-in-out 0s;
 }
 
 body.login form .wp-pwd { position: relative; }
